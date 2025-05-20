@@ -1,0 +1,93 @@
+controller
+export const getServicios = async (req, res) => {
+  try {
+    const idArea = req.params.idArea;
+    const RES = await Gets.getInfoServicios(idArea);
+    if (!RES) { return res.status(404).json({ desc: "No se encontró información" }); }
+    return res.status(200).json(RES);
+  } catch (error) {
+    res.status(500).json({ error: "Error interno en el servidor" });
+  }
+};
+
+// export const getCategorias = async (req, res) => {
+//   try {
+//     const idArea = req.params.idArea;
+//     const idServicio = req.params.idServicio;
+//     const RES = await Gets.getInfoCategorias(idArea, idServicio);
+//     if (!RES) { return res.status(404).json({ desc: "No se encontró información" }); }
+//     return res.status(200).json(RES);
+//   } catch (error) {
+//     res.status(500).json({ error: "Error interno en el servidor" });
+//   }
+// };
+// export const getSubcategorias = async (req, res) => {
+//   try {
+//     const idArea = req.params.idArea;
+//     const idServicio = req.params.idServicio;
+//     const idCategoria = req.params.idCategoria;
+//     const RES = await Gets.getInfoSubcategorias(idArea, idServicio, idCategoria);
+//     if (!RES) { return res.status(404).json({ desc: "No se encontró información" }); }
+//     return res.status(200).json(RES);
+//   } catch (error) {
+//     res.status(500).json({ error: "Error interno en el servidor" });
+//   }
+// };
+
+Router
+
+router.get(
+  "/tickets/crear/getServicios/:idArea",
+  verifyToken,
+  verifyRole(["Root", "Administrador"]),
+  getServicios
+);
+// router.get(
+//   "/tickets/crear/getCategorias/:idArea/:idServicio",
+//   verifyToken,
+//   verifyRole(["Root", "Administrador"]),
+//   getCategorias
+// );
+// router.get(
+//   "/tickets/crear/getSubcategorias/:idArea/:idServicio/:idCategoria",
+//   verifyToken,
+//   verifyRole(["Root", "Administrador"]),
+//   getSubcategorias
+// );
+
+
+Modelo
+
+import mongoose from "mongoose";
+
+const serviciosModel = mongoose.Schema(
+    {
+      Servicio: {
+        type: String,
+        trim: true,
+        required: true,
+      },
+      idArea: [
+        { type: Schema.Types.ObjectId,
+          ref: 'Area',
+          required: true }
+      ],
+    },
+    {
+      timesStampes: true,
+    }
+  );
+  
+  export default mongoose.model("SERVICIOS", serviciosModel, "Servicios");
+
+
+Gets
+
+export const getInfoServicios = async (idArea) => {
+  try {
+    const RES = await SERVICIOS.findOne({ idArea });
+    return RES;
+  } catch (error) {
+    return false;
+  }
+};
