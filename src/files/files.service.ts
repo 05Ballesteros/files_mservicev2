@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
+import { Response } from "express";
+import { join } from "path"
 @Injectable()
 export class FilesService {
     async handleFileUpload(files: Express.Multer.File[], protocol: string, host: string): Promise<any[]> {
@@ -11,5 +12,10 @@ export class FilesService {
             name: file.filename,
             url: `${protocol}://${host}/files/uploads/${file.filename}`,
         }));
+    }
+
+    async downloadFile(filename: string, res: Response) {
+        const filePath = join(process.cwd(), "uploads", filename);
+        return res.sendFile(filePath)
     }
 };

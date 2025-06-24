@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post, Req, Res, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Post, Req, Res, NotFoundException, UploadedFiles, UseGuards, UseInterceptors, StreamableFile } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FilesService } from './files.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -30,18 +30,26 @@ export class FilesController {
             );
         }
     }
+    
     @Get('/uploads/:filename')
-    async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
+    async downloadFile(
+        @Param('filename') filename: string,
+        @Res({ passthrough: true }) res: Response
+    ): Promise<StreamableFile> {
         try {
-            const filePath = join(process.cwd(), 'src', 'uploads', filename);
+            const filePath = join(process.cwd(), 'uploads', filename);
 
             if (!existsSync(filePath)) {
-                throw new HttpException('Archivo no encontrado', HttpStatus.NOT_FOUND);
+                throw new NotFoundException('Archivo no encontrado');
             }
 
             const fileStream = createReadStream(filePath);
-            res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-            return fileStream.pipe(res);
+            res.set({
+                'Content-Disposition': `attachment; filename="${filename}"`,
+                'Content-Type': 'application/octet-stream',
+            });
+
+            return new StreamableFile(fileStream);
         } catch (error) {
             throw new HttpException(
                 { desc: error.message || 'Error interno del servidor' },
@@ -49,4 +57,5 @@ export class FilesController {
             );
         }
     }
-}
+
+} 
