@@ -13,7 +13,7 @@ COPY package*.json ./
 RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/*.json .                                  
-EXPOSE 4401
+EXPOSE 4400
 CMD ["node", "dist/main"]
  
  

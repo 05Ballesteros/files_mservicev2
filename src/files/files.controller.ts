@@ -20,7 +20,7 @@ export class FilesController {
         @Res() res: Response,
     ) {
         try {
-            const host = `${req.protocol}://${req.get('host')}/files/uploads`;
+            const host = req.get('host') ?? 'archivos:4300';
             const uploadedFiles = await this.filesService.handleFileUpload(files, req.protocol, host);
             return res.status(HttpStatus.CREATED).send(uploadedFiles);
         } catch (error) {
@@ -30,7 +30,7 @@ export class FilesController {
             );
         }
     }
-    
+
     @Get('/uploads/:filename')
     async downloadFile(
         @Param('filename') filename: string,
