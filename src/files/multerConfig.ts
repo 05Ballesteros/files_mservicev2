@@ -1,9 +1,13 @@
 import { diskStorage } from 'multer';
-
+import { existsSync, mkdirSync } from 'fs';
+const uploadPath = 'src/uploads';
+if (!existsSync(uploadPath)) {
+    mkdirSync(uploadPath, { recursive: true });
+}
 export const multerConfig = {
     storage: diskStorage({
         destination: (req, file, cb) => {
-            cb(null, 'uploads');
+            cb(null, uploadPath);
         },
         filename: (req, file, cb) => {
             const uniqueName = `${Date.now()}-${file.originalname}`;
