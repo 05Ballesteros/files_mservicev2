@@ -19,9 +19,11 @@ export class FilesController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
+        console.log("SI esta llegando:", files);
         try {
             const host = `${req.protocol}://${req.get('host')}/files/uploads`;
             const uploadedFiles = await this.filesService.handleFileUpload(files, req.protocol, host);
+            if (uploadedFiles) { console.log("Archivos guardados"); }
             return res.status(HttpStatus.CREATED).send(uploadedFiles);
         } catch (error) {
             throw new HttpException(
