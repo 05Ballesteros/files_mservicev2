@@ -3,7 +3,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FilesService } from './files.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Request, Response } from 'express';
-import { multerConfig } from './multerConfig';
+import { multerConfig } from '../multerConfig';
 import { join } from 'path';
 import { createReadStream, existsSync } from 'fs';
 
@@ -19,7 +19,6 @@ export class FilesController {
         @Req() req: Request,
         @Res() res: Response,
     ) {
-        console.log("SI esta llegando:", files);
         try {
             const host = req.get('host') ?? 'archivos:4300';
             const uploadedFiles = await this.filesService.handleFileUpload(files, req.protocol, host);
@@ -33,7 +32,7 @@ export class FilesController {
         }
     }
 
-    @Get('/uploads/:filename')
+    @Get('uploads/:filename')
     async downloadFile(
         @Param('filename') filename: string,
         @Res({ passthrough: true }) res: Response
